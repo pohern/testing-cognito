@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CognitoUser, CognitoUserPool } from "amazon-cognito-identity-js";
+import { CognitoUser } from "amazon-cognito-identity-js";
 import Pool from "../UserPool";
 
 const ForgotPassword = () => {

@@ -6,6 +6,10 @@ const Attributes = () => {
   const { getSession } = useContext(AccountContext);
   useEffect(() => {
     //Todo: Fetch the current plan from cognito
+    getSession().then((data) => {
+        console.log('DATA:', data)
+        setPlan(data['custom:plan']);
+    })
   });
 
   const onSubmit = (e) => {
@@ -16,7 +20,7 @@ const Attributes = () => {
         new CognitoUserAttribute({ Name: "custom:plan", Value: plan }),
       ];
       user.updateAttributes(attributes, (err, result) => {
-        if (err) console.log(err);
+        if (err) console.error(err);
         console.log(result);
       });
     });
@@ -25,7 +29,7 @@ const Attributes = () => {
     <div>
       <h1>Update your plan:</h1>
       <form onSubmit={onSubmit}>
-        <input value={plan} onChange={(e) => e.target.value} />
+        <input value={plan} onChange={(e) => setPlan(e.target.value)} />
         <button type='submit'>Change Plan</button>
       </form>
     </div>
