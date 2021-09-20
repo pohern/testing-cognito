@@ -5,39 +5,65 @@ import Pool from "../UserPool";
 const AccountContext = createContext();
 
 const Account = (props) => {
-  const authenticate = async(Username, Password) => 
+  const getSession = async () =>
     await new Promise((resolve, reject) => {
-        const user = new CognitoUser({
-          Username,
-          Pool,
+      const user = Pool.getCurrentUser();
+      if (user) {
+        user.getSession((err, session) => {
+          if (err) {
+            reject();
+          } else {
+            resolve(session);
+          }
         });
-        const authDetails = new AuthenticationDetails({
-          Username,
-          Password,
-        });
+      } else {
+        reject();
+      }
+    });
+  const authenticate = async (Username, Password) =>
+    await new Promise((resolve, reject) => {
+      const user = new CognitoUser({
+        Username,
+        Pool,
+      });
+      const authDetails = new AuthenticationDetails({
+        Username,
+        Password,
+      });
 
-        user.authenticateUser(authDetails, {
-          onSuccess: (data) => {
-            console.log("onSuccess: ", data);
-            resolve(data)
-          },
-          onFailure: (err) => {
-            console.log("onFailure: ", err);
-            reject(err)
-          },
-          newPasswordRequired: (data) => {
-            console.log("newPasswordRequired: ", data);
-            resolve(data)
-          },
-        });
+      user.authenticateUser(authDetails, {
+        onSuccess: (data) => {
+          console.log("onSuccess: ", data);
+          resolve(data);
+        },
+        onFailure: (err) => {
+          console.log("onFailure: ", err);
+          reject(err);
+        },
+        newPasswordRequired: (data) => {
+          console.log("newPasswordRequired: ", data);
+          resolve(data);
+        },
+      });
     });
 
-  return( 
-  <AccountContext.Provider value={{
-      authenticate
-  }}>
+  const logout = () => {
+    const user = Pool.getCurrentUser();
+    if (user) {
+      user.signOut();
+    }
+  };
+
+  return (
+    <AccountContext.Provider
+      value={{
+        authenticate,
+        getSession,
+        logout,
+      }}
+    >
       {props.children}
-  </AccountContext.Provider>
+    </AccountContext.Provider>
   );
 };
 
