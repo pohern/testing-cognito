@@ -1,8 +1,13 @@
-import './App.css';
+import React from 'react';
+import Signup from './components/SignUp'
+import Login from './components/Login'
 
 function App() {
   return (
-    <h1>Testing Cognito</h1>
+    <div>
+      <Signup />
+      <Login />
+    </div>
   );
 }
 
